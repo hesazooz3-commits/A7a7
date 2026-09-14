@@ -20,25 +20,24 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-
       - name: Check project structure
         run: |
           echo "=== Project files ==="
           ls -la
           echo "=== App folder ==="
-          ls -la app || true
-          echo "=== Settings ==="
-          cat settings.gradle.kts
+          ls -la app || echo "No app folder found"
+          echo "=== Gradle files ==="
+          ls -la *.gradle.kts || echo "No gradle files"
 
-      - name: Build APK
-        run: gradle :app:assembleDebug --no-daemon
+      - name: Grant execute permission to Gradle
+        run: chmod +x gradlew || true
+
+      - name: Build APK with wrapper
+        run: ./gradlew clean :app:assembleDebug --no-daemon --stacktrace || gradle clean :app:assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: A7A-Cards-APK
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
