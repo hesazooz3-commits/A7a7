@@ -1,6 +1,7 @@
 name: Build A7A Cards APK
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,8 +25,17 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Check project structure
+        run: |
+          echo "=== Project files ==="
+          ls -la
+          echo "=== App folder ==="
+          ls -la app || true
+          echo "=== Settings ==="
+          cat settings.gradle.kts
+
       - name: Build APK
-        run: gradle assembleDebug --no-daemon
+        run: gradle :app:assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
